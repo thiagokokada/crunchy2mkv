@@ -26,6 +26,7 @@ Should be compatible with both Python 2.7+ and Python 3.2+.
 from __future__ import print_function
 
 import argparse
+import atexit
 import glob
 import os
 import sys
@@ -140,6 +141,11 @@ def video2mkv(file_path, result_path):
 
     return result_filename
 
+def clean_up(directory = "."):
+    directory = os.path.abspath(directory)
+    print("Cleaning up {} directory.".format(directory), file = sys.stderr)
+    shutil.rmtree(directory)
+
 def _argparser():
     parser = argparse.ArgumentParser(description = "Download videos from "
                                      "Crunchyroll (and maybe other sites) "
@@ -175,6 +181,8 @@ def main():
     try:
         for url in args.url:
             tempdir = mkdtemp()
+            # Clean up temporary directory at exit
+            atexit.register(clean_up, directory = tempdir)
             os.chdir(tempdir)
             youtube_dl(url, username, password, quality, subs)
             for file_ext in _SUPPORTED_EXTENSIONS:
@@ -182,10 +190,8 @@ def main():
                 if filename:
                     result_filename = video2mkv(filename[0], result_path)
     except KeyboardInterrupt:
-        print("User canceled operation.", file = sys.stderr)
-    finally:
-        print("Cleaning up {} directory.".format(tempdir), file = sys.stderr)
-        shutil.rmtree(tempdir)
+        sys.exit("User canceled operation.")
+
     print("Video {} download succesfully!".format(result_filename))
     print("Resulting videos can be found in {} directory.".format(result_path))
 
