@@ -30,12 +30,19 @@ import glob
 import os
 import sys
 import shutil
+from distutils.spawn import find_executable
 from subprocess import call, check_call, CalledProcessError
 from tempfile import mkdtemp
 
+# Dependencies path
+YTDL_PATH = find_executable("youtube-dl") # /usr/bin/youtube-dl, youtube-dl.exe
+MKVMERGE_PATH = find_executable("mkvmerge") # /usr/bin/mkvmerge, mkvmerge.exe
+if not YTDL_PATH:
+    sys.exit("Could not find youtube-dl installed.")
+if not MKVMERGE_PATH:
+    sys.exit("Could not find mkvmerge installed.")
+
 # You can set your desired preferences here
-YTDL_PATH = "youtube-dl" # "/usr/bin/youtube-dl" or "youtube-dl.exe"
-MKVMERGE_PATH = "mkvmerge" # "/usr/bin/mkvmerge" or "mkvmerge.exe"
 RESULT_PATH = "."
 USERNAME = None
 PASSWORD = None
@@ -47,19 +54,6 @@ SUBS = "all"
 # Don't change these settings unless you know what you're doing!
 _SUPPORTED_EXTENSIONS = ["flv", "mp4", "ogg", "webm"]
 
-
-def check_deps(*deps):
-    """Check if all dependencies are in PATH
-    
-    *deps -- string for each program to check if it's installed
-
-    """
-    _dev_null = open(os.devnull, 'wb')
-    try:
-        for dep in deps:
-            call(dep, stdout = _dev_null, stderr = _dev_null)
-    except OSError:
-        sys.exit("You doesn't seem to have {} installed.".format(dep))
 
 def youtube_dl(url, username = None, password = None, quality = "best",
                subs = "all"):
@@ -166,9 +160,6 @@ def _argparser():
     return parser
 
 def main():
-    # Check if all dependencies are installed
-    check_deps(YTDL_PATH, MKVMERGE_PATH)
-
     parser = _argparser()
     if len(sys.argv) == 1:
         parser.print_help()
