@@ -44,6 +44,9 @@ SUBS = "all"
 # SUBS = "en,pt"
 # SUBS = None
 
+# Don't change these settings unless you know what you're doing!
+_SUPPORTED_EXTENSIONS = ["flv", "mp4", "ogg", "webm"]
+
 
 def check_deps(*deps):
     """Check if all dependencies are in PATH
@@ -51,11 +54,10 @@ def check_deps(*deps):
     *deps -- string for each program to check if it's installed
 
     """
-    # Python 2 compatibility
-    _DEVNULL = open(os.devnull, 'wb')
+    _dev_null = open(os.devnull, 'wb')
     try:
         for dep in deps:
-            call(dep, stdout = _DEVNULL, stderr = _DEVNULL)
+            call(dep, stdout = _dev_null, stderr = _dev_null)
     except OSError:
         sys.exit("You doesn't seem to have {} installed.".format(dep))
 
@@ -107,13 +109,10 @@ def youtube_dl(url, username = None, password = None, quality = "best",
     except CalledProcessError:
         sys.exit("Error while downloading URL {}. Exiting...".format(url))
 
-def flv2mkv(file_dir, result_path):
-    """Simple mkvmerge wrapper to convert .flv videos to .mkv
+def video2mkv(file_path, result_path):
+    """Simple mkvmerge wrapper to convert videos to .mkv
 
-    It simple enters in the target directory, find all .flv videos in
-    there and convert each of them to .mkv (including subtitles).
-
-    file_dir -- target directory containing .flv videos
+    file_path -- target video to be converted to .mkv
     result_path -- directory for resulting files in .mkv
 
     """
@@ -123,40 +122,34 @@ def flv2mkv(file_dir, result_path):
     # Expand result_path
     result_path = os.path.expanduser(result_path)
 
-    # Go to source director
-    os.chdir(file_dir)
+    # Split filename and extension
+    filename, extension = os.path.splitext(file_path)
+    
+    # Find all files with the same filename, independent of the extension
+    for media in glob.glob("{}.*".format(filename)):
+        # Added them to .mkv
+        cmd.append(media)
+    
+    # Added output file
+    result_filename = os.path.join(result_path, filename)
+    cmd.append("-o")
+    cmd.append("{}.mkv".format(result_filename))
+    
+    # Try to create .mkv file
+    print("Trying to create {}.".format(result_filename))
+    try:
+        print("Running command: {}".format(" ".join(cmd)))
+        check_call(cmd)
+    except CalledProcessError:
+        sys.exit("Error while creating {} file. Exiting..."
+                 .format(result_filename))
 
-    # Store the filenames for each processed video
-    results = []    
-    # Find all .flv files
-    for flv in glob.glob("*.flv"):
-        # Split filename and extension
-        filename, extension = os.path.splitext(flv)
-        
-        # Find all files with the same filename, independent of the extension
-        for media in glob.glob("{}.*".format(filename)):
-            # Added them to .mkv
-            cmd.append(media)
-        
-        # Added output file
-        result_filename = os.path.join(result_path, filename)
-        cmd.append("-o")
-        cmd.append("{}.mkv".format(result_filename))
-        
-        # Try to create .mkv file
-        print("Trying to create {}.".format(result_filename))
-        try:
-            print("Running command: {}".format(" ".join(cmd)))
-            check_call(cmd)
-            results.append(result_filename)
-        except CalledProcessError:
-            sys.exit("Error while creating {} file. Exiting...".format(result_filename))
-
-    return results
+    return result_filename
 
 def _argparser():
-    parser = argparse.ArgumentParser(description = "Download videos from Crunchyroll "
-                                    "(and maybe other sites) and convert them to .mkv.")
+    parser = argparse.ArgumentParser(description = "Download videos from "
+                                     "Crunchyroll (and maybe other sites) "
+                                     "and convert them to .mkv.")
     parser.add_argument("url",  nargs = "+", help = "Video URL to download")
     parser.add_argument("-r", "--result", metavar = "PATH", action = "store",
                         default = RESULT_PATH, help = "path to result directory")
@@ -193,14 +186,17 @@ def main():
             tempdir = mkdtemp()
             os.chdir(tempdir)
             youtube_dl(url, username, password, quality, subs)
-            results = flv2mkv(tempdir, result_path)
+            for file_ext in _SUPPORTED_EXTENSIONS:
+                filename = glob.glob("*.{}".format(file_ext))
+                if filename:
+                    result_filename = video2mkv(filename[0], result_path)
     except KeyboardInterrupt:
         print("User canceled operation.", file = sys.stderr)
     finally:
         print("Cleaning up {} directory.".format(tempdir), file = sys.stderr)
         shutil.rmtree(tempdir)
-    print("Videos {} download succesfully!".format(" ".join(results)))
-    print("Videos can be found in {} directory.".format(result_path))
+    print("Video {} download succesfully!".format(result_filename))
+    print("Resulting videos can be found in {} directory.".format(result_path))
 
 if __name__ == "__main__":
     main()
