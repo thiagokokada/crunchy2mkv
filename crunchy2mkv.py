@@ -125,7 +125,9 @@ def flv2mkv(file_dir, result_path):
 
     # Go to source director
     os.chdir(file_dir)
-    
+
+    # Store the filenames for each processed video
+    results = []    
     # Find all .flv files
     for flv in glob.glob("*.flv"):
         # Split filename and extension
@@ -146,8 +148,11 @@ def flv2mkv(file_dir, result_path):
         try:
             print("Running command: {}".format(" ".join(cmd)))
             check_call(cmd)
+            results.append(result_filename)
         except CalledProcessError:
             sys.exit("Error while creating {} file. Exiting...".format(result_filename))
+
+    return results
 
 def _argparser():
     parser = argparse.ArgumentParser(description = "Download videos from Crunchyroll "
@@ -177,7 +182,7 @@ def main():
         sys.exit(2)
     
     args = parser.parse_args()
-    result_path = args.result
+    result_path = os.path.abspath(args.result)
     username = args.username
     password = args.password
     quality = args.quality
@@ -188,12 +193,14 @@ def main():
             tempdir = mkdtemp()
             os.chdir(tempdir)
             youtube_dl(url, username, password, quality, subs)
-            flv2mkv(tempdir, result_path)
+            results = flv2mkv(tempdir, result_path)
     except KeyboardInterrupt:
         print("User canceled operation.", file = sys.stderr)
     finally:
         print("Cleaning up {} directory.".format(tempdir), file = sys.stderr)
         shutil.rmtree(tempdir)
+    print("Videos {} download succesfully!".format(" ".join(results)))
+    print("Videos can be found in {} directory.".format(result_path))
 
 if __name__ == "__main__":
     main()
