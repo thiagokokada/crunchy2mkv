@@ -114,9 +114,6 @@ def video2mkv(file_path, result_path):
     # Basic command line
     cmd = [MKVMERGE_PATH]
     
-    # Expand result_path
-    result_path = os.path.expanduser(result_path)
-
     # Split filename and extension
     filename, extension = os.path.splitext(file_path)
     
@@ -172,7 +169,8 @@ def main():
         sys.exit(2)
     
     args = parser.parse_args()
-    result_path = os.path.abspath(args.result)
+    result_path = os.path.expanduser(args.result)
+    result_path = os.path.abspath(result_path)
     username = args.username
     password = args.password
     quality = args.quality
