@@ -126,7 +126,7 @@ def video2mkv(file_path, result_path, verbose = False):
     filename, extension = os.path.splitext(file_path)
     
     # Find all files with the same filename, independent of the extension
-    for media in glob.glob("{}.*".format(filename)):
+    for media in sorted(glob.glob("{}.*".format(filename))):
         # Added them to .mkv
         cmd.append(media)
     
@@ -199,7 +199,7 @@ def main():
             os.chdir(tempdir)
             youtube_dl(url, username, password, quality, subs, verbose)
             for file_ext in _SUPPORTED_EXTENSIONS:
-                filename = glob.glob("*.{}".format(file_ext))
+                filename = sorted(glob.glob("*.{}".format(file_ext)))
                 if filename:
                     filename = filename[0]
                     result_filename = video2mkv(filename, result_path, verbose)
