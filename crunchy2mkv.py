@@ -23,7 +23,8 @@ Should be compatible with both Python 2.7+ and Python 3.2+.
 
 """
 
-from __future__ import print_function
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
 
 import argparse
 import atexit
