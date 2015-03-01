@@ -46,6 +46,7 @@ if not MKVMERGE_PATH:
 
 # You can set your desired preferences here
 RESULT_PATH = "."
+VERBOSE = False
 USERNAME = None
 PASSWORD = None
 QUALITY = "best" # worst, 360p, 480p, 720p, 1080p, best
@@ -55,10 +56,11 @@ SUBS = "all"
 
 # Don't change these settings unless you know what you're doing!
 _SUPPORTED_EXTENSIONS = ["flv", "mp4", "ogg", "webm"]
+_DEVNULL = open(os.devnull, "wb")
 
 
 def youtube_dl(url, username = None, password = None, quality = "best",
-               subs = "all"):
+               subs = "all", verbose = False):
     """Simple youtube-dl wrapper
 
     url -- Video url to download
@@ -73,6 +75,7 @@ def youtube_dl(url, username = None, password = None, quality = "best",
     otherwise the passed string is passed to "--subs-lang" option
     in youtube-dl, without any checks. If None is passed, this
     option is ignored.
+    verbose -- show youtube-dl output in stdout/stderr
     
     """
     # Basic command line
@@ -100,16 +103,20 @@ def youtube_dl(url, username = None, password = None, quality = "best",
     # Try to download video
     print("Trying to download video from URL {}.".format(url))
     try:
-        print("Running command: {}".format(" ".join(cmd)))
-        check_call(cmd)
+        if verbose:
+            print("Running command: {}".format(" ".join(cmd)))
+            check_call(cmd)
+        else:
+            check_call(cmd, stderr = _DEVNULL, stdout = _DEVNULL)
     except CalledProcessError:
         sys.exit("Error while downloading URL {}. Exiting...".format(url))
 
-def video2mkv(file_path, result_path):
+def video2mkv(file_path, result_path, verbose = False):
     """Simple mkvmerge wrapper to convert videos to .mkv
 
     file_path -- target video to be converted to .mkv
     result_path -- directory for resulting files in .mkv
+    verbose -- show mkvmerge output in stdout/stderr
 
     """
     # Basic command line
@@ -129,19 +136,23 @@ def video2mkv(file_path, result_path):
     cmd.append("{}.mkv".format(result_filename))
     
     # Try to create .mkv file
-    print("Trying to create {}.".format(result_filename))
+    print("Trying to create {}.mkv.".format(result_filename))
     try:
-        print("Running command: {}".format(" ".join(cmd)))
-        check_call(cmd)
+        if verbose:
+            print("Running command: {}".format(" ".join(cmd)))
+            check_call(cmd)
+        else:
+            check_call(cmd, stderr = _DEVNULL, stdout = _DEVNULL)
     except CalledProcessError:
         sys.exit("Error while creating {} file. Exiting..."
                  .format(result_filename))
 
-    return result_filename
+    return "{}.mkv".format(result_filename)
 
-def clean_up(directory = "."):
+def clean_up(directory = ".", verbose = False):
+    if verbose:
+        print("Cleaning up {} directory.".format(directory), file = sys.stderr)
     directory = os.path.abspath(directory)
-    print("Cleaning up {} directory.".format(directory), file = sys.stderr)
     shutil.rmtree(directory)
 
 def _argparser():
@@ -159,7 +170,9 @@ def _argparser():
                         help = "video quality")
     parser.add_argument("-s", "--subs", metavar = "LANG", action = "store",
                         default = SUBS, help = "subtitle language(s)")
-    parser.add_argument('-v', '--version', action='version', version="0.1")
+    parser.add_argument("-v", "--verbose", action = "store_true",
+                        default = VERBOSE, help = "show extra information (for debug purposes)")
+    parser.add_argument("--version", action = "version", version = "0.1")
 
     return parser
 
@@ -172,6 +185,7 @@ def main():
     args = parser.parse_args()
     result_path = os.path.expanduser(args.result)
     result_path = os.path.abspath(result_path)
+    verbose = args.verbose
     username = args.username
     password = args.password
     quality = args.quality
@@ -181,18 +195,18 @@ def main():
         for url in args.url:
             tempdir = mkdtemp()
             # Clean up temporary directory at exit
-            atexit.register(clean_up, directory = tempdir)
+            atexit.register(clean_up, directory = tempdir, verbose = verbose)
             os.chdir(tempdir)
-            youtube_dl(url, username, password, quality, subs)
+            youtube_dl(url, username, password, quality, subs, verbose)
             for file_ext in _SUPPORTED_EXTENSIONS:
                 filename = glob.glob("*.{}".format(file_ext))
                 if filename:
-                    result_filename = video2mkv(filename[0], result_path)
+                    filename = filename[0]
+                    result_filename = video2mkv(filename, result_path, verbose)
+                    print("Video {} download succesfully!".
+                            format(result_filename))
     except KeyboardInterrupt:
         sys.exit("User canceled operation.")
-
-    print("Video {} download succesfully!".format(result_filename))
-    print("Resulting videos can be found in {} directory.".format(result_path))
 
 if __name__ == "__main__":
     main()
