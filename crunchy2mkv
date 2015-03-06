@@ -31,6 +31,7 @@ import glob
 import os
 import sys
 import shutil
+from distutils.util import strtobool
 from distutils.spawn import find_executable
 from subprocess import call, check_call, CalledProcessError
 from tempfile import mkdtemp
@@ -50,15 +51,15 @@ if not YTDL_PATH:
 if not MKVMERGE_PATH:
     sys.exit("Could not find mkvmerge installed.")
 
-# You can set your desired preferences here
-RESULT_PATH = "."
-VERBOSE = False
-USERNAME = None
-PASSWORD = None
-QUALITY = "best"  # worst, 360p, 480p, 720p, 1080p, best
-SUBS = "all"
-# SUBS = "en,pt"
-# SUBS = None
+# You can set your desired preferences by setting environmental variables.
+RESULT_PATH = os.getenv("C2M_RESULT_PATH", ".")
+VERBOSE = strtobool(os.getenv("C2M_VERBOSE", "False"))
+USERNAME = os.getenv("C2M_USERNAME")
+PASSWORD = os.getenv("C2M_PASSWORD")
+# worst, 360p, 480p, 720p, 1080p, best
+QUALITY = os.getenv("C2M_QUALITY", "best")
+# "en"/"en,pt"/""
+SUBS = os.getenv("C2M_SUBS", "all")
 
 # Don't change these settings unless you know what you're doing!
 _SUPPORTED_EXTENSIONS = ["flv", "mp4", "ogg", "webm"]

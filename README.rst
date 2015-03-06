@@ -30,8 +30,13 @@ Run like this:
 
 To get a list of all available options.
 
-There is no configuration file! You can change some defaults by changing variables directly in the source code (nothing to fear, all variables that can be changed are explicit marked in the source).
+There is no configuration file! You can change some defaults by changing the following environment variables:
 
+- ``C2M_RESULT_PATH``: set the desired output path (example: ``/home/m45t3r/Videos`` or ``C:\Videos``);
+- ``C2M_VERBOSE``: use ``True`` for verbose output, use ``False`` to only print user friendly messages (default);
+- ``C2M_USERNAME`` and ``C2M_PASSWORD``: set your username and password;
+- ``C2M_QUALITY``: set the desired default quality (some valid options: ``worst``, ``360p``, ``480p``, ``720p``, ``1080p``, ``best``)
+- ``C2M_SUBS``: set desired subtitle langauge (valid examples: ``all``, ``en``, ``en,pt``, ``""``)
 
 How to install
 ~~~~~~~~~~~~~~
