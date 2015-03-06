@@ -43,9 +43,12 @@ __maintainer__ = "Thiago Kenji Okada"
 __email__ = "thiago DOT mast3r AT gmail DOT com"
 __status__ = "Development"
 
-# Dependencies path
-YTDL_PATH = find_executable("youtube-dl")
-MKVMERGE_PATH = find_executable("mkvmerge")
+if sys.platform == "win32":
+    YTDL_PATH = "youtube_dl.exe"
+    MKVMERGE_PATH = "mkvmerge.exe"
+else:
+    YTDL_PATH = find_executable("youtube-dl")
+    MKVMERGE_PATH = find_executable("mkvmerge")
 if not YTDL_PATH:
     sys.exit("Could not find youtube-dl installed.")
 if not MKVMERGE_PATH:
