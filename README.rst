@@ -53,6 +53,14 @@ After that just run ``crunchy2mkv.py`` using the full path, or added it somewher
 
     $ /random/path/crunchy2mkv.py -v # or PATH=/random/path:${PATH} crunchy2mkv.py -v
 
+Difference between crunchy2mkv and livedumper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The main difference between both is that crunchy2mkv uses `youtube-dl`_, while `livedumper`_ uses `livestreamer`_. This makes the behavior between the two slightly different.
+
+For example, in `Crunchyroll`_ livestreamer emulates the PS3 API, that brings high quality videos using the HLS protocol. Using this protocol makes Crunchyroll send hardcoded subtitles (i.e. encoded with the video). For instance, youtube-dl hacks the available Flash Video player to get the audio/video/subtitles. The Crunchyroll's Flash Video player are actually special since they support a encrypt version of Advance Substation Alpha subtitles, so the result are softsub videos that can even include subtitles from different languages.
+
+crunchy2mkv is very simple: it's basically a script that wrappers both ``youtube-dl`` and ``mkvmerge``. It's not as powerfull as livedumper was, but this made the code much simpler and smaller.
 
 About Python versions
 ~~~~~~~~~~~~~~~~~~~~~
@@ -68,3 +76,6 @@ This project is based on `youtube-dl`_ and `mkvtoolnix`_ projects. Thanks!
 .. _`youtube-dl`: https://rg3.github.io/youtube-dl/
 .. _`many more`: https://rg3.github.io/youtube-dl/supportedsites.html
 .. _`mkvtoolnix`: https://www.bunkus.org/videotools/mkvtoolnix/
+.. _`livedumper`: https://github.com/m45t3r/livedumper
+.. _`livestreamer`: http://docs.livestreamer.io/
+.. _`Crunchyroll`: http://www.crunchyroll.com/
