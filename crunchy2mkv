@@ -36,6 +36,13 @@ from distutils.spawn import find_executable
 from subprocess import call, check_call, CalledProcessError
 from tempfile import mkdtemp
 
+__author__ = "Thiago Kenji Okada"
+__license__ = "MIT"
+__version__ = "0.1"
+__maintainer__ = "Thiago Kenji Okada"
+__email__ = "thiago DOT mast3r AT gmail DOT com"
+__status__ = "Development"
+
 # Dependencies path
 YTDL_PATH = find_executable("youtube-dl") # /usr/bin/youtube-dl, youtube-dl.exe
 MKVMERGE_PATH = find_executable("mkvmerge") # /usr/bin/mkvmerge, mkvmerge.exe
@@ -172,7 +179,7 @@ def _argparser():
                         default = SUBS, help = "subtitle language(s)")
     parser.add_argument("-v", "--verbose", action = "store_true",
                         default = VERBOSE, help = "show extra information (for debug purposes)")
-    parser.add_argument("--version", action = "version", version = "0.1")
+    parser.add_argument("--version", action = "version", version = __version__)
 
     return parser
 
