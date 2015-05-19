@@ -41,7 +41,7 @@ There is no configuration file! You can change some defaults by changing the fol
 How to install
 ~~~~~~~~~~~~~~
 
-You need to have both ``youtube-dl` and ``mkvmerge`` (part of ``mkvtoolnix``) installed and added somewhere on your PATH. Probably the best way is to use your distribution packages to install this program. Some distribution commands to install both:
+You need to have both ``youtube-dl`` and ``mkvmerge`` (part of ``mkvtoolnix``) installed and added somewhere on your PATH. Probably the best way is to use your distribution packages to install this program. Some distribution commands to install both:
 
 ::
 
