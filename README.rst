@@ -14,19 +14,19 @@ To run this program, you just need to call it like this:
 
 ::
 
-    $ crunchy2mkv.py http://www.crunchyroll.com/fatekaleid-liner-prisma-illya/episode-1-illya-grow-up-657285
+    $ crunchy2mkv http://www.crunchyroll.com/fatekaleid-liner-prisma-illya/episode-1-illya-grow-up-657285
 
 This will download this video in the highest quality that is possible in the current folder (you can change this passing the ``-r /path/to/folder`` option). You can download multiple files calling the program with multiple URLs. If the service limits videos only for premium users you can pass your login information like this:
 
 ::
 
-    $ crunchy2mkv.py -u username -p password http://www.crunchyroll.com/fatekaleid-liner-prisma-illya/episode-1-illya-grow-up-657285
+    $ crunchy2mkv -u username -p password http://www.crunchyroll.com/fatekaleid-liner-prisma-illya/episode-1-illya-grow-up-657285
 
 Run like this:
 
 ::
 
-    $ crunchy2mkv.py -h
+    $ crunchy2mkv -h
 
 To get a list of all available options.
 
@@ -47,11 +47,11 @@ You need to have both ``youtube-dl`` and ``mkvmerge`` (part of ``mkvtoolnix``) i
 
     $ sudo pacman -S youtube-dl mkvtoolnix-cli # Arch Linux
 
-After that just run ``crunchy2mkv.py`` using the full path, or added it somewhere in your path.
+After that just run ``crunchy2mkv`` using the full path, or added it somewhere in your path.
 
 ::
 
-    $ /random/path/crunchy2mkv.py -v # or PATH=/random/path:${PATH} crunchy2mkv.py -v
+    $ /random/path/crunchy2mkv -v # or PATH=/random/path:${PATH} crunchy2mkv -v
 
 Difference between crunchy2mkv and livedumper
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""crunchy2mkv.py
+"""crunchy2mkv
 
 Download .flv videos from Crunchyroll (and maybe other sites) and
 convert them to .mkv.
